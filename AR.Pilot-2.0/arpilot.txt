@@ -1,0 +1,119 @@
+ARPilot Documentation
+---------------------
+
+ARPilot is a small navigation interface tool for the AR.Drone2.0.
+It takes its input from STDIN and relays control commands to
+the drone. It can be executed on any pc-based linux host as
+well as on the drone itself.
+
+It supports several commands to directly control drone flight,
+as well as a number of commands that control the drone until a
+desired state is achieved.
+
+Automations are used for heading (turn until facing angle X),
+and flight altitude (go up or down until at altitude X).
+
+Automatic monitors are used for battery low and low altitude
+events. At 10% battery the altitude is set to 5m (if higher).
+At 5% battery the drone will land.
+If the altitude drops to less than 60cm for a prolonged time
+the drone will rise to 85cm. Also it is possible to have the
+drone stay alt a given altitude over time (altitude fix) where
+the altitude error is compensated by a second altitude monitor.
+(see $ERR command)
+
+Command syntax:
+---------------
+
+All commands are prepended by a start character '$' and 4 leters
+of the respective command. (i.e. $MOVE) The command is followed
+by a comma sign, and the needed number of parameters separated 
+by commata. A newline '\n' indicates that the command is ended.
+Commands are executed continously until the next command is 
+received, but at the most for 2 seconds: then the drone is 
+automatically put in 'HOVER' mode and its own autopilot is 
+activated. It will hold position until the next command is issued.
+
+Values:
+
+The MOVE command takes its pitch, roll, gaz, and yaw values as
+integers ranging between -1024 to 1024. Height is always given
+in millimeters. Degree values are given in 1/1000 of a degree.
+
+Commands:
+
+MOVE - Move the drone
+  $MOVE,roll,pitch,gaz,yaw
+  Directly set the drone in motion using roll,pitch,gaz,and yaw.
+
+STAT - Set drone state
+  $STAT,state
+  Set the drone flight state
+    state:  0 - land
+            1 - fly
+          666 - emergency
+
+TRIM - Execute a trim command
+  $TRIM
+  Set the accelerometer and magnetometer offsets.
+
+HOVE - Switch to hover
+  $HOVE
+  Switch to the drones autopilot. Cancels all monitors and 
+  automations.
+
+CALI - Calibrate the sensor(s)
+  $CALI
+  Calibrate the magnetometer (Compass sensor). 
+
+PRIN - Print some navdata information 
+  $PRIN
+  Print navdata and internal information.
+
+HEAD - Head towards a given angle
+  $HEAD,angle
+  Automation: rotate the drone until pointing at given angle.
+
+TURN - Execute a turn
+  $TURN,angle
+  Automation: rotate the drone by given angle
+
+ALTI - Go to a specified altitude
+  $ALTI,height,state
+  Automation: rise or fall to the given altitude
+              state: if set to '1' then monitor height and keep 
+                     altitude.
+
+RISE - Rise by some value
+  $RISE,height
+  Automation: rise or fall by 'height' millimeters.
+              If altitude monitor is active, keep new height.
+
+RECO - Record video
+  $RECO,state
+  Turn USB recording on or off ( '1' or '0').
+
+ERRO - Detect and store error values
+  $ERRO,angle,height
+  Update the internal error values for angle and height.
+  This helps the controller keep track of the distance to the
+  ground and the current heading angle by taking other sources
+  (i.e GPS) into account. Note that height is not absolute but
+  over ground level (starting point, or navpoint).
+  This is used for altitude fix.
+
+LIMI - Set angle and speed limits
+  $LIMI,yaw,vz,euler_angle,altitude
+  Set the limits in the drone to given values.
+  NOTE: The yaw and euler angles are given in 1/100 fractions, 
+  instead of 1.75 set 175 
+
+ECHO - Output what was input
+  $ECHO,data
+  Output data. Useful for debugging and logging.
+
+QUIT - End program
+  $QUIT
+  Exit the controller app
+
+
