@@ -1,6 +1,6 @@
 This repo contains my AR.Drone Projects:
 
 AR.Pilot-2.0:  lib and control application for the AR.Drone 2.0
-ARduino.Pilot: arduino control code for AR.Pilot
+ARduino     :  arduino control code for AR.Pilot
 
 The current state of this project is alpha! (Tested but may still contain bad bugs)
