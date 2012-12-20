@@ -17,9 +17,20 @@
  *   along with libarpilot.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
 
 #ifndef COMMAND_H_
 #define COMMAND_H_
+
+int command_set_lon(float lon);
+
+int command_set_lat(float lat);
+
+int command_set_alt(int lat);
+
+int command_set_course(int course);
+
+int command_set_hdop(int hdop);
 
 int command_state(int state);
 

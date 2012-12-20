@@ -36,10 +36,12 @@
 #include "monitor.h"
 #include "navdata.h"
 #include "network.h"
+#include "web.h"
 
 unsigned int last_timestamp_nav = 0;
 
 char cmdbuffer[BUFLEN];
+int  http_fd = 0;
 
 int process()
 {
@@ -71,6 +73,17 @@ int process()
     if (nav_state == 1){
         fds[nfds].fd = nav_sock;
         fds[nfds++].events = POLLIN;
+    }
+
+    if (web_state == 1){
+        if (http_fd){
+            fds[nfds].fd = http_fd;
+            fds[nfds++].events = POLLIN;
+        }
+        else {
+            fds[nfds].fd = web_sock;
+            fds[nfds++].events = POLLIN;
+        }
     }
 
     // Loop step 1 : Read stdin
@@ -112,7 +125,17 @@ int process()
             	char tmpbuffer[8192];
 //                      printf("  Listening vid socket is readable\n");
             	size = read (vid_sock, tmpbuffer, 8192);
+
+            	send_vid_data(tmpbuffer,size);
+
 //            	printf("Siz=%d\n",size);
+            }
+            if (fds[i].fd == web_sock) {
+            	http_fd = accept_web(web_sock);
+            }
+            if (fds[i].fd == http_fd) {
+            	handle_web(http_fd);
+            	http_fd = 0;
             }
         }
     }

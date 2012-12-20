@@ -56,6 +56,13 @@ extern int drone_yaw;   // Yaw
 
 extern int is_recording;
 
+// Drone position in command.c
+extern float pos_lon;
+extern float pos_lat;
+extern int   pos_alt;
+extern int   pos_course;
+extern int   pos_hdop;
+
 // Drone correction values in command.c
 extern int err_drone_altitude;
 extern int err_drone_phi;
@@ -67,6 +74,10 @@ extern int drone_ref_flags;
 // Network Sockets in network.c
 extern int nav_sock;
 extern int vid_sock;
+
+// Network sockets in web.c
+extern int web_sock;
+extern int web_state;
 
 // Navdata timestamp in controller.c
 extern unsigned int last_timestamp_io;

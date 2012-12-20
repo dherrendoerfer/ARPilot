@@ -22,6 +22,16 @@ drone stay alt a given altitude over time (altitude fix) where
 the altitude error is compensated by a second altitude monitor.
 (see $ERR command)
 
+Furthermore it is possible for the client to pass the current 
+GPS position to the drone and have the drone log it.
+
+Logging:
+--------
+
+libarpilot provides a http interface at port 8080 that provides
+access to current states of the drone, logs, and emergency control
+methods. Refer to 'http://drone:8080/index.html'.
+
 Command syntax:
 ---------------
 
@@ -40,7 +50,8 @@ The MOVE command takes its pitch, roll, gaz, and yaw values as
 integers ranging between -1024 to 1024. Height is always given
 in millimeters. Degree values are given in 1/1000 of a degree.
 
-Commands:
+Control commands:
+-----------------
 
 MOVE - Move the drone
   $MOVE,roll,pitch,gaz,yaw
@@ -117,3 +128,25 @@ QUIT - End program
   Exit the controller app
 
 
+GPS related commands
+--------------------
+
+PLON - Position: longitude
+  $PLON,longitude
+  Set the longitude (float value)
+  
+PLAT - Position: latitude
+  $PLAT,latitude
+  Set the latitude (float)
+  
+PALT - Position: altitude
+  $PALT,altitude
+  Set the altitude (int)
+
+PCOU - Position: course
+  $PCOU,course
+  Set the course (int, 0-359)
+
+PHDOP - Position: Horizontal dilusion of precision
+  $PHDOP,hdop
+  Set the current hdop value (int)

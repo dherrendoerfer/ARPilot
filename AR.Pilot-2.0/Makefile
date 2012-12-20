@@ -22,7 +22,7 @@ CC = gcc
 INSTALL = install
 TARGET = /usr/sbin
 
-LIB_OBJS=command.o controller.o emitter.o init.o monitor.o navdata.o network.o pilot.o
+LIB_OBJS=command.o controller.o emitter.o init.o log.o monitor.o navdata.o network.o pilot.o web.o
 PROG_OBJS=arpilot.o
 LIB=arpilot.a
 PROG=arpilot
@@ -42,4 +42,4 @@ install: $(PROG)
 	$(INSTALL) $(PROG) $(TARGET)/$(PROG)
 
 clean:
-	rm -f $(OBJS) $(PROG)
+	rm -f $(PROG_OBJS) $(LIB_OBJS) $(PROG)

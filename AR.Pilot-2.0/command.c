@@ -28,6 +28,7 @@
 #include "controller.h"
 #include "emitter.h"
 #include "network.h"
+#include "web.h"
 
 int drone_init  = 0; // Initialized
 int drone_fly   = 0; // Flying
@@ -54,6 +55,41 @@ int err_drone_phi = 0;
 int drone_pcmd_flags = 0;
 int drone_ref_flags  = 0;
 
+float pos_lon;
+float pos_lat;
+int   pos_alt;
+int   pos_course;
+int   pos_hdop;
+
+int command_set_lon(float lon)
+{
+	pos_lon = lon;
+	return 0;
+}
+
+int command_set_lat(float lat)
+{
+	pos_lat = lat;
+	return 0;
+}
+
+int command_set_alt(int alt)
+{
+	pos_alt = alt;
+	return 0;
+}
+
+int command_set_course(int course)
+{
+	pos_course = course;
+	return 0;
+}
+
+int command_set_hdop(int hdop)
+{
+	pos_hdop = hdop;
+	return 0;
+}
 
 int command_state(int state)
 {
@@ -296,7 +332,6 @@ void command_idle()
 	drone_yaw        = 0;
 	drone_pcmd_flags = 0;
 }
-
 
 void update_drone()
 {

@@ -32,7 +32,9 @@
 #include "command.h"
 #include "controller.h"
 #include "init.h"
+#include "log.h"
 #include "network.h"
+#include "web.h"
 
 char commandbuffer[BUFLEN];
 int  commandbufferlen=0;
@@ -51,6 +53,7 @@ int execcommand()
     int index = 5;
     int args = 0;
     int arg[8];
+    float farg[8];
 
     while (index < commandlen)
         if (command[index++] == ',')
@@ -66,15 +69,34 @@ int execcommand()
 
     while (index < commandlen)
         if (command[index++] == ','){
-            arg[args]=atoi((char*)(command+index));
-            //printf("Arg[%i]: %i \n",args,arg[args]);
+        	if (strncmp((char*)(command+index),".", commandlen - index) < 0)
+        		arg[args]=atoi((char*)(command+index));
+        	else {
+        		farg[args]=atof((char*)(command+index));
+        		arg[args]=(int)farg[args];
+        	}
+//            printf("Arg[%i] : %i \n",args,arg[args]);
+//            printf("Farg[%i]: %f \n",args,farg[args]);
             args++;
     }
 
 //  printf("Cmd: %s\n",command);
+    logmsg(command,commandlen);
 
-    if ((strncmp(command,"$MOVE",5) == 0) && args == 4)
-        ret=command_move(arg[0],arg[1],arg[2],arg[3]);
+    if ((strncmp(command,"$PLON",5) == 0) && args == 1)
+        ret=command_set_lon(farg[0]);
+
+    if ((strncmp(command,"$PLAT",5) == 0) && args == 1)
+        ret=command_set_lat(farg[0]);
+
+    if ((strncmp(command,"$PALT",5) == 0) && args == 1)
+        ret=command_set_alt(arg[0]);
+
+    if ((strncmp(command,"$PCOU",5) == 0) && args == 1)
+        ret=command_set_course(arg[0]);
+
+    if ((strncmp(command,"$HDOP",5) == 0) && args == 1)
+        ret=command_set_hdop(arg[0]);
 
     if ((strncmp(command,"$STAT",5) == 0) && args == 1)
         ret=command_state(arg[0]);
@@ -205,23 +227,24 @@ int main()
 
     if (setup_net())
     	exit(1);
-
     printf("net \n");
-    if (init_navdata())
-    	exit(1);
 
+/*    if (init_navdata())
+    	exit(1);
     printf("nav \n");
 
-    if (init_vid())
-    	exit(1);
+//    if (init_vid())
+//    	exit(1);
+//    printf("vid \n");
 
-    printf("vid \n");
     // Init the drone
-
     if (config_init())
     	exit(1);
-
     printf("ini \n");
+*/
+    if (init_web())
+    	exit(1);
+    printf("web \n");
 
     // Start the main loop
 
