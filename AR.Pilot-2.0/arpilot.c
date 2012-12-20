@@ -95,7 +95,7 @@ int execcommand()
     if ((strncmp(command,"$PCOU",5) == 0) && args == 1)
         ret=command_set_course(arg[0]);
 
-    if ((strncmp(command,"$HDOP",5) == 0) && args == 1)
+    if ((strncmp(command,"$PHDO",5) == 0) && args == 1)
         ret=command_set_hdop(arg[0]);
 
     if ((strncmp(command,"$STAT",5) == 0) && args == 1)
@@ -229,7 +229,7 @@ int main()
     	exit(1);
     printf("net \n");
 
-/*    if (init_navdata())
+    if (init_navdata())
     	exit(1);
     printf("nav \n");
 
@@ -241,7 +241,7 @@ int main()
     if (config_init())
     	exit(1);
     printf("ini \n");
-*/
+
     if (init_web())
     	exit(1);
     printf("web \n");

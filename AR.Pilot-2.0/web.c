@@ -239,7 +239,7 @@ void send_emergency(int http_fd)
 
 void send_video(int http_fd)
 {
-	char vidhead[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: video/mp4\r\n\r\n"};
+	char vidhead[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: video/H264\r\n\r\n"};
 	char novid[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: text/html\r\n\r\n"
 			         "<HTML>\n<HEAD>\n<TITLE>No more vid slots free</TITLE>\n</HEAD>\n"};
 

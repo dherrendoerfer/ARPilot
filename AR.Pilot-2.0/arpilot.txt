@@ -147,6 +147,6 @@ PCOU - Position: course
   $PCOU,course
   Set the course (int, 0-359)
 
-PHDOP - Position: Horizontal dilusion of precision
+PHDO - Position: Horizontal dilusion of precision
   $PHDOP,hdop
   Set the current hdop value (int)
