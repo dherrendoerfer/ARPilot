@@ -6,9 +6,13 @@ It takes its input from STDIN and relays control commands to
 the drone. It can be executed on any pc-based linux host as
 well as on the drone itself.
 
+ARPilot is built on top of libarpilot, which offers all the 
+needed functionality to operate the drone.
+
 It supports several commands to directly control drone flight,
 as well as a number of commands that control the drone until a
-desired state is achieved.
+desired state is achieved like changing heading, or reaching a
+desired altitude.
 
 Automations are used for heading (turn until facing angle X),
 and flight altitude (go up or down until at altitude X).
@@ -24,6 +28,7 @@ the altitude error is compensated by a second altitude monitor.
 
 Furthermore it is possible for the client to pass the current 
 GPS position to the drone and have the drone log it.
+
 
 Logging:
 --------
@@ -148,5 +153,5 @@ PCOU - Position: course
   Set the course (int, 0-359)
 
 PHDO - Position: Horizontal dilusion of precision
-  $PHDOP,hdop
+  $PHDO,hdop
   Set the current hdop value (int)

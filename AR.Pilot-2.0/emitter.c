@@ -75,10 +75,10 @@ void addATPCMD(char *buffer, int roll, int pitch, int gaz, int yaw )
 {
     assert(sizeof(int)==sizeof(float));
     int i_arg0 = drone_pcmd_flags;
-    float f_arg1 = (float)roll  / 1024;
-    float f_arg2 = (float)pitch / 1024;
-    float f_arg3 = (float)gaz   / 1024;
-    float f_arg4 = (float)yaw   / 1024;
+    float f_arg1 = (float)roll  / 1000;
+    float f_arg2 = (float)pitch / 1000;
+    float f_arg3 = (float)gaz   / 1000;
+    float f_arg4 = (float)yaw   / 1000;
 
     sprintf(buffer+strlen(buffer),"AT*PCMD=%d,%d,%d,%d,%d,%d\r",
     seq++,

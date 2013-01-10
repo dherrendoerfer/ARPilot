@@ -289,11 +289,11 @@ void pilot_setup()
   Serial.print(wp_location);
   Serial.print("\n");
 
-  /*Limits: max_yaw 1.75
+  /*Limits: max_yaw 2.50
              max_vz  700
           max_euler 0.30
            altitude 50000 (50m)*/
-  Serial.print("$LIMI,175,700,30,50000\n"); /*Not sure that this works yet*/
+  Serial.print("$LIMI,250,700,30,50000\n"); /*Not sure that this works yet*/
 }
 
 void pilot_liftoff()

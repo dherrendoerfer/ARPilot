@@ -27,6 +27,7 @@ char commandbuffer[BUFLEN];
 int  commandbufferlen=0;
 */
 
+#define LOGLENGTH 80
 
 extern int  seq;
 extern int  config_confirm_wait;
@@ -80,8 +81,9 @@ extern int web_sock;
 extern int web_state;
 
 // Navdata timestamp in controller.c
-extern unsigned int last_timestamp_io;
+extern unsigned int last_timestamp_command;
 extern unsigned int last_timestamp_nav;
+extern int lockout_control;
 
 // Network sockets in network.h
 extern struct sockaddr_in si_nav, si_vid;

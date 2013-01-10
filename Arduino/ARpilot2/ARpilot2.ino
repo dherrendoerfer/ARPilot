@@ -42,7 +42,7 @@
 #include <TinyGPS.h>
 #include <SoftwareSerial.h>
 
-#define VERSION "v2.0_20121126_1"
+#define VERSION "v2.0_20130108_1"
 
 SoftwareSerial GPS = SoftwareSerial(4,3);
 TinyGPS        gps;
@@ -141,6 +141,8 @@ void loop()
 //    fc   = mycourse();           // course in degrees
     mycourse();                  //update course_b
     fkmh = gps.f_speed_kmph();   // speed in km/hr
+    
+    drone_setpos();
 
     if (navigation == 0) {
       Serial.print("$ECHO,#NAV:START\n"); 

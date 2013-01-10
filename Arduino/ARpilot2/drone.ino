@@ -20,7 +20,30 @@
 void drone_hover()
 {
   Serial.print("$HOVE\n");
-  //Serial.print("$ECHO,#HOVE\n");
+}
+
+void drone_setpos()
+{
+  Serial.print("$PLON,");
+  Serial.print(flon,10);
+  Serial.print("\n");
+  
+  Serial.print("$PLAT,");
+  Serial.print(flat,10);
+  Serial.print("\n");
+
+  Serial.print("$PALT,");
+  Serial.print(falt,0);
+  Serial.print("\n");
+  
+  Serial.print("$PCOU,");
+  Serial.print(course_b,10);
+  Serial.print("\n");
+  
+  Serial.print("$HDOP,");
+  Serial.print(gps.hdop());
+  Serial.print("\n");
+  
 }
 
 void drone_move(int roll, int pitch, int gaz, int yaw)
@@ -29,17 +52,7 @@ void drone_move(int roll, int pitch, int gaz, int yaw)
   int troll   = -1;
    
   translate_pitch_roll(pitch, roll, camera_angle, &tpitch, &troll);
-/*
-  Serial.print("$ECHO,#MOVE,");
-  Serial.print(troll);
-  Serial.print(",");
-  Serial.print(tpitch);
-  Serial.print(",");
-  Serial.print(gaz);
-  Serial.print(",");
-  Serial.print(yaw);
-  Serial.print("\n");
-*/
+
   Serial.print("$MOVE,");
   Serial.print(troll);
   Serial.print(",");
@@ -52,16 +65,10 @@ void drone_move(int roll, int pitch, int gaz, int yaw)
 }
 
 void drone_alti(float height, int monitor_on)
-{
-  
+{ 
   Serial.print("$ALTI,");
   Serial.print((height*1000),0);
   Serial.print(",0\n");
-/*
-  Serial.print("$ECHO,#ALTI,");
-  Serial.print((height*1000),0);
-  Serial.print(",0\n");
-  */
 }
 
 void drone_head(float direction)
@@ -75,11 +82,6 @@ void drone_head(float direction)
   Serial.print("$HEAD,");
   Serial.print(direction*1000, 0);
   Serial.print("\n");
-/*
-  Serial.print("$ECHO,#HEAD,");
-  Serial.print(direction*1000, 0);
-  Serial.print("\n");
-  */
 }
 
 void drone_turn(float direction)
@@ -88,11 +90,7 @@ void drone_turn(float direction)
   Serial.print("$TURN,");
   Serial.print(direction*1000, 0);
   Serial.print("\n");
-/*
-  Serial.print("$ECHO,#TURN,");
-  Serial.print(direction*1000, 0);
-  Serial.print("\n");
-  */
+
   drone_angle += direction;
   
   if (drone_angle > 360)

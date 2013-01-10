@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include "states.h"
+#include "command.h"
 #include "arpilot.h"
 
 int auto_pilot()
@@ -45,12 +46,17 @@ int auto_pilot()
 				return 1;
 			}
 			else {
+				int speed = 300;
+				if (abs(diff_angle > 35000))
+					speed = 900;
+
 				if (diff_angle > 180000){
-					drone_yaw  = -500;
+					drone_yaw  = -1 * speed;
 				}
 				else {
-					drone_yaw  = 500;
+					drone_yaw  = speed;
 				}
+				set_command_timestamp();
 			}
 		}
 	}
@@ -69,12 +75,17 @@ int auto_pilot()
 			return 1;
 		}
 		else {
+			int speed = 400;
+			if (alt_diff > 800)
+				speed = 900;
+
 			if(alt < pilot_altitude){
-				drone_gaz = 500;
+				drone_gaz = speed;
 			}
 			else {
-				drone_gaz = -500;
+				drone_gaz = -1 * speed;
 			}
+			set_command_timestamp();
 		}
 	}
 

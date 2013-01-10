@@ -49,85 +49,41 @@ int log_sockets[5];
 
 void send_index(int http_fd)
 {
-	char buffer[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: text/html\r\n\r\n"
-			         "<HTML>\n<HEAD>\n<TITLE>libarpilot</TITLE>\n"
-"<style type=\"text/css\">"
-"#control { display: none;}"
-"#control:target { display: block;}"
-"#control:not(:target) {display: none;}"
-"body {"
-"background-color: #444;"
-"}"
-"a {"
-"  padding: 0.1em;"
-"  padding-bottom: 0;"
-""
-"  color:            #000;"
-"  text-decoration:  none;"
-""
-"  border:       1px solid gray;"
-"  border-left:  0;"
-"  border-right: 0;"
-"  font-size: 24px;"
-"  font-family: monospace;"
-"}"
-"h1 {"
-"       font-family: monospace;"
-"       font-size: 24px;"
-"       color: #000;"
-"       background-color: #aaaaaa;"
-"}"
-""
-"a:link {"
-"  background-color: #99b440;"
-"}"
-""
-"a:visited {"
-"  background: #99b440;"
-"}"
-""
-"a:hover, a:focus {"
-"  background:    #ff5900;"
-"  outline-color: #ffc873"
-"}"
-""
-"a:active {"
-"  background:   #689ad3;"
-"  border-style: dotted;"
-"}"
-".mtest {"
-"       color: #bada55"
-"       text-shadow: 0 0 20px black;"
-"}"
-"</style>"
-"</HEAD>"
-"<BODY>"
-"<ul id=\"control\">"
-"<H1>Control Panel:</H1><P>"
-"</ul>"
-"<H1>Please select:</H1><P>"
-"<A href=command.html>Control</A><P>"
-"<A href=stat.html>Status</A><P>"
-"<A href=emer.html>Emergency</A><P>"
-					  "</BODY></HTML>"};
+	char buffer[] = {
+				  "</HEAD>"
+				"<BODY>"
+				  "<H1>Control Panel:</H1><P>"
+				  "<H1>Please select:</H1><P>"
+				  "<A href=command.html>Control</A><P>"
+				  "<A href=stat.html>Status</A><P>"
+				  "<A href=emer.html>Emergency</A><P>"
+				"</BODY>"
+			  "</HTML>"};
 
+	send(http_fd,http_header,sizeof(http_header),MSG_NOSIGNAL);
+	send(http_fd,css,sizeof(css),MSG_NOSIGNAL);
 	send(http_fd,buffer,sizeof(buffer),MSG_NOSIGNAL);
 }
 
 void send_status(int http_fd)
 {
-	char head[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: text/html\r\n\r\n"
-			         "<HTML>\n<HEAD>\n<TITLE>libarpilot</TITLE>\n</HEAD>\n"
-				      "<BODY><A href=stat.html><H1>libarpilot status:</H1></A><P>"};
-
-	char tail[] = {"</BODY></HTML>"};
+	char tail[] = {"</BODY>"
+			     "</HTML>"};
 
 	char tmp[2048];
 	int i;
 
-	send(http_fd,head,sizeof(head),MSG_NOSIGNAL);
+	send(http_fd,http_header,sizeof(http_header),MSG_NOSIGNAL);
+	send(http_fd,css,sizeof(css),MSG_NOSIGNAL);
 
-	if(!	navdata_valid){
+	sprintf(tmp,
+			    "</HEAD>"
+			      "<BODY>"
+			        "<A href=stat.html>libarpilot status:</A><P>");
+
+	send(http_fd,tmp,strlen(tmp),MSG_NOSIGNAL);
+
+	if(navdata_valid){
 		float32_t heading = navdata_unpacked.navdata_demo.psi;
 		        if (heading < 0)
 		            heading += 360000;
@@ -151,12 +107,14 @@ void send_status(int http_fd)
         sprintf(tmp,"<P><H2>drone flight</H2>"
                     "drone_init: %d<BR>"
                     "drone_fly: %d<BR>"
+        		    "lockout_control: %d<BR>"
                     "drone_roll: %d<BR>"
                     "drone_pitch: %d<BR>"
                     "drone_gaz: %d<BR>"
                     "drone_yaw: %d<BR>"
                       ,drone_init
                       ,drone_fly
+                      ,lockout_control
                       ,drone_roll
                       ,drone_pitch
                       ,drone_gaz
@@ -203,7 +161,7 @@ void send_status(int http_fd)
         send(http_fd,tmp,strlen(tmp),MSG_NOSIGNAL);
 
         for(i=0; i<50; i++){
-		    char buffer[41];
+		    char buffer[LOGLENGTH+1];
 
 		    getlogmsg(i, buffer);
 
@@ -213,8 +171,6 @@ void send_status(int http_fd)
 
 		sprintf(tmp,"</PRE></TD></TABLE>");
         send(http_fd,tmp,strlen(tmp),MSG_NOSIGNAL);
-
-
 	}
 	else {
 		char buffer[] = {"There is no valid navdata.<BR>"};
@@ -226,13 +182,14 @@ void send_status(int http_fd)
 
 void send_emergency(int http_fd)
 {
-    char buffer[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: text/html\r\n\r\n"
-                     "<HTML>\n<HEAD>\n<TITLE>libarpilot</TITLE>\n</HEAD>\n"
+    char buffer[] = {"</HEAD>\n"
                       "<BODY><H1>Please select:</H1><P>"
                       "<H2><A href=cmd.html?cmd=land>--- Inject Land ---</A>"
                       "&lt --- &gt <A href=cmd.html?cmd=emer>--- Set Emergency ---</A></H2><BR>"
                       "</BODY></HTML>"};
 
+    send(http_fd,http_header,sizeof(http_header),MSG_NOSIGNAL);
+    send(http_fd,css,sizeof(css),MSG_NOSIGNAL);
     send(http_fd,buffer,sizeof(buffer),MSG_NOSIGNAL);
 }
 
@@ -332,6 +289,13 @@ void send_log_data(char *buffer,int len)
 	}
 }
 
+void send_command(int http_fd)
+{
+    send(http_fd,http_header,sizeof(http_header),MSG_NOSIGNAL);
+	send(http_fd,css,sizeof(css),MSG_NOSIGNAL);
+    send(http_fd,doc_command,sizeof(doc_command),MSG_NOSIGNAL);
+}
+
 void send_cmd(int http_fd, char *buffer)
 {
     char error[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: text/html\r\n\r\n"
@@ -381,25 +345,32 @@ void send_cmd(int http_fd, char *buffer)
             command_move(0,0,0,300);
             return;
         }
-        if (!strncmp(buffer,"start",2)) {
+        if (!strncmp(buffer,"start",5)) {
         	command_state(1);
         	return;
         }
-        if (!strncmp(buffer,"land",2)) {
+        if (!strncmp(buffer,"land",4)) {
         	command_state(0);
         	return;
         }
-        if (!strncmp(buffer,"emer",2)) {
+        if (!strncmp(buffer,"emer",4)) {
             command_state(666);
             return;
         }
-        if (!strncmp(buffer,"rec",2)) {
+        if (!strncmp(buffer,"rec",3)) {
         	if (!is_recording)
         		command_record(1);
         	else
         		command_record(0);
         	return;
         }
+        if (!strncmp(buffer,"lock",4)) {
+         	if (!lockout_control)
+         		lockout_control=1;
+         	else
+         		lockout_control=0;
+         	return;
+         }
 
         return; /*Ignore unknown commands*/
     }
@@ -458,12 +429,8 @@ int handle_web(int http_fd)
 	char buffer[4096];
 	int len = 0;
 
-//    printf("web:http_handle\n");
-
     bzero(buffer,4096);
     len = read(http_fd, buffer, 4096);
-
-//    printf("read: %d\n",len);
 
     if (strncmp(buffer,"\n\n",len) < 0)
     	goto end_close;
@@ -473,50 +440,37 @@ int handle_web(int http_fd)
 
     /* Look for known documents */
     if (!strncmp(buffer,"GET /index.html",15)){
-    	printf("index\n");
-
     	send_index(http_fd);
     	goto end_close;
     }
 
     if (!strncmp(buffer,"GET /stat.html",14)){
-    	printf("stat\n");
-
     	send_status(http_fd);
     	goto end_close;
     }
 
     if (!strncmp(buffer,"GET /video.html",15)){
-    	printf("stat\n");
-
     	send_video(http_fd);
     	goto end_leave;
     }
 
     if (!strncmp(buffer,"GET /command.html",17)){
-        printf("command\n");
-
         send_command(http_fd);
         goto end_close;
     }
 
     if (!strncmp(buffer,"GET /log.html",13)){
-        printf("log\n");
-
         send_log(http_fd);
         goto end_leave;
     }
 
     if (!strncmp(buffer,"GET /cmd.html?",14)){
-        printf("cmd\n");
-
+    	printf("WEB-CMD\n");
         send_cmd(http_fd, buffer+14);
         goto end_close;
     }
 
     if (!strncmp(buffer,"GET /emer.html",14)){
-    	printf("emer\n");
-
         send_emergency(http_fd);
         goto end_close;
     }

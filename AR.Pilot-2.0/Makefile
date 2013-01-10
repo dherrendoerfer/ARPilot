@@ -42,4 +42,4 @@ install: $(PROG)
 	$(INSTALL) $(PROG) $(TARGET)/$(PROG)
 
 clean:
-	rm -f $(PROG_OBJS) $(LIB_OBJS) $(PROG)
+	rm -f $(PROG_OBJS) $(LIB_OBJS) $(PROG) $(LIB)

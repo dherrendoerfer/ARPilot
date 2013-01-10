@@ -39,9 +39,15 @@
 #include "web.h"
 
 unsigned int last_timestamp_nav = 0;
+unsigned int last_timestamp_command = 0;
+
+int lockout_control = 0;
 
 char cmdbuffer[BUFLEN];
 int  http_fd = 0;
+
+int flag_no_navdata = 1;
+int flag_no_command = 1;
 
 int process()
 {
@@ -50,18 +56,18 @@ int process()
     int    rc,i,timeout,ret,mret;
     struct timeval ts;
     struct timezone tz;
-    int flag_no_navdata = 0;
 
     timeout = 20;
     ret = 0;
 
+    /*Send all outstanding commands from command buffer*/
     if (strlen(cmdbuffer) > 0) {
     	udp_send_command(cmdbuffer);
     	bzero(cmdbuffer,BUFLEN);
     }
 
-    gettimeofday(&ts,&tz);
-    last_timestamp_nav=ts.tv_sec*1000+ts.tv_usec/1000 + 5000;
+//    gettimeofday(&ts,&tz);
+//    last_timestamp_nav=ts.tv_sec*1000+ts.tv_usec/1000 + 5000;
 
     nfds = 0;
 
@@ -86,9 +92,6 @@ int process()
         }
     }
 
-    // Loop step 1 : Read stdin
-
-//      printf("Waiting on poll()...\n");
     rc = poll(fds, nfds, timeout);
 
     if (rc < 0) {
@@ -96,8 +99,7 @@ int process()
     }
 
     if (rc == 0) {
-//          printf("  poll() timed out.\n");
-        // if no input for 2s hover the drone
+    	/* Ignore, just finish the duty cycle */
     }
     else {
         for (i = 0; i < nfds; i++) {
@@ -106,29 +108,26 @@ int process()
 
             if(fds[i].revents != POLLIN) {
             	printf("  Error! revents = %d\n", fds[i].revents);
-//                    break;
 
             }
             if (fds[i].fd == nav_sock) {
                 int size;
-//                      printf("  Listening nav socket is readable\n");
                 gettimeofday(&ts,&tz);
                 last_timestamp_nav=ts.tv_sec*1000+ts.tv_usec/1000;
-                        size = recvfrom (nav_sock, navdata_buffer, NAVDATA_BUFFER_SIZE, 0,
-                        (struct sockaddr *)&si_nav,
-                        (socklen_t *)&slen);
+                size = recvfrom (nav_sock, navdata_buffer, NAVDATA_BUFFER_SIZE, 0,
+                      			(struct sockaddr *)&si_nav,
+                       			(socklen_t *)&slen);
                 decode_navdata(navdata_buffer,size);
             }
             if (fds[i].fd == vid_sock) {
 
             	int size;
             	char tmpbuffer[8192];
-//                      printf("  Listening vid socket is readable\n");
             	size = read (vid_sock, tmpbuffer, 8192);
 
             	send_vid_data(tmpbuffer,size);
 
-//            	printf("Siz=%d\n",size);
+            	//printf("Siz=%d\n",size);
             }
             if (fds[i].fd == web_sock) {
             	http_fd = accept_web(web_sock);
@@ -145,20 +144,40 @@ int process()
     * */
 
     gettimeofday(&ts,&tz);
+    unsigned int msecs = ts.tv_sec*1000+ts.tv_usec/1000;
 
-    if ((ts.tv_sec*1000+ts.tv_usec/1000) > last_timestamp_nav+2000) {
+    /* Navdata timeout
+     * After two seconds without navdata warn, and inform
+     * other handlers. */
+    if ((msecs - last_timestamp_nav) > 2000) {
         // nav timeout
-        if (!flag_no_navdata )
+        if (!flag_no_navdata ) {
             printf("!WARN:navdata\n");
             navdata_valid = 0;
+        }
         flag_no_navdata = 1;
     }
     else {
         flag_no_navdata = 0;
     }
 
-    // If waiting for a config confirmation wait until the COMMAND_MASK has
-    // gone to 1 and then been reset.
+    /* Control timeout handling
+     * Two seconds without a control (move) command put the
+     * drone in hover mode.
+     */
+    if ((msecs - last_timestamp_command) > 2000) {
+        if (!flag_no_command ) {
+            printf("!WARN:command timeout\n");
+            command_idle();
+        }
+        flag_no_command = 1;
+    }
+    else {
+        flag_no_command = 0;
+    }
+
+    /* If waiting for a config confirmation wait until the COMMAND_MASK has
+     * gone to 1 and then been reset. */
     if (config_confirm_wait == 1) {
         if (navdata_unpacked.mykonos_state & MYKONOS_COMMAND_MASK) {
         	config_confirm_wait++;
@@ -167,20 +186,18 @@ int process()
 
             addATCTRL(buffer,5,0);
             udp_send_command(buffer);
-//            printf("ACK=1\n");
         }
         else {
-        	return 2; // AGAIN
+        	return 2; // Run process() AGAIN
         }
     }
     else {
     	if (config_confirm_wait == 2) {
             if (!(navdata_unpacked.mykonos_state & MYKONOS_COMMAND_MASK)) {
             	config_confirm_wait = 0;
-//                printf("ACK=0\n");
             }
             else {
-            	return 2; // AGAIN
+            	return 2; // Run process() AGAIN
             }
     	}
     }
@@ -203,6 +220,13 @@ int process()
     // Send an update packet to the drone
     // also: current flight instructions
     update_drone();
+
+    /* If the internal controller has been selected
+     * we keep returning 2 here, this makes control
+     * from the app impossible, except if it overrides
+     * even that. */
+    if (lockout_control)
+    	ret = 2;
 
     return ret;
 }

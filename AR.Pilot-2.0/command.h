@@ -22,6 +22,8 @@
 #ifndef COMMAND_H_
 #define COMMAND_H_
 
+void set_command_timestamp();
+
 int command_set_lon(float lon);
 
 int command_set_lat(float lat);

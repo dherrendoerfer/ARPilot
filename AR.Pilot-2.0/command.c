@@ -22,6 +22,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/time.h>
+
 #include "states.h"
 #include "arpilot.h"
 
@@ -60,6 +62,15 @@ float pos_lat;
 int   pos_alt;
 int   pos_course;
 int   pos_hdop;
+
+void set_command_timestamp()
+{
+    struct timeval ts;
+    struct timezone tz;
+
+    gettimeofday(&ts,&tz);
+    last_timestamp_command=ts.tv_sec*1000+ts.tv_usec/1000;
+}
 
 int command_set_lon(float lon)
 {
@@ -123,6 +134,8 @@ int command_state(int state)
         drone_fly = 0;
     }
 
+    set_command_timestamp();
+
     return 0;
 }
 int command_move(int roll, int pitch, int gaz, int yaw)
@@ -144,6 +157,9 @@ int command_move(int roll, int pitch, int gaz, int yaw)
     }
 
     drone_pcmd_flags = DRONE_PCMD_FLAG_PROGRESSIVE;
+
+    set_command_timestamp();
+
     return 0;
 }
 
@@ -172,6 +188,8 @@ int command_hover(void)
 int command_cali(void)
 {
     addATCALIB(cmdbuffer);
+
+    set_command_timestamp();
 
     return 0;
 }
@@ -230,6 +248,8 @@ int command_head(int angle)
     pilot_heading=angle;
     pilot_head=1;
 
+    set_command_timestamp();
+
     return 0;
 }
 
@@ -239,6 +259,8 @@ int command_alti(int altitude, int monitor_state)
     pilot_alti=1;
 
     monitor_alti = monitor_state;
+
+    set_command_timestamp();
 
     return 0;
 }
@@ -265,6 +287,8 @@ int command_turn(int delta_angle)
         return -1;
     }
 
+    set_command_timestamp();
+
     return 0;
 }
 
@@ -282,6 +306,8 @@ int command_rise(int delta_altitude)
     else {
         return -1;
     }
+
+    set_command_timestamp();
 
     return 0;
 }

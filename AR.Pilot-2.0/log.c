@@ -27,7 +27,6 @@
 
 #include "web.h"
 
-#define LOGLENGTH 80
 
 char logbuffer[100][LOGLENGTH];
 int logcounter=0;
