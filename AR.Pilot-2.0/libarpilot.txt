@@ -1,0 +1,62 @@
+libarpilot Documentation
+------------------------
+
+libarpilot provides the following functions to control the AR.Drone 2.0:
+
+Change drone behavior:
+-----------------------
+int command_set_lon(float lon);
+
+int command_set_lat(float lat);
+
+int command_set_alt(int lat);
+
+int command_set_course(int course);
+
+int command_set_hdop(int hdop);
+
+int command_state(int state);
+
+int command_move(int roll, int pitch, int gaz, int yaw);
+
+int command_trim(void);
+
+int command_hover(void);
+
+int command_cali(void);
+
+int command_print(void);
+
+int command_record(int state);
+
+int command_head(int angle);
+
+int command_alti(int altitude, int monitor_state);
+
+int command_turn(int delta_angle);
+
+int command_rise(int delta_altitude);
+
+int command_error(int my_alti, int my_phi);
+
+int command_limit(int yaw, int vz, int angle, int altitude);
+
+void command_idle();
+
+
+Process drone data and events, update drone:
+--------------------------------------------
+int process();
+
+
+Init functions:
+---------------
+int setup_net();
+
+int init_navdata();
+
+int config_init();
+
+int init_web();
+
+More to come:

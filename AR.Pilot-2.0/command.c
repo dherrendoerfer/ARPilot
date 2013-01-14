@@ -143,17 +143,17 @@ int command_move(int roll, int pitch, int gaz, int yaw)
     drone_roll       = roll;
     drone_pitch      = pitch;
 
+    drone_gaz  = gaz;
     if (gaz != 0) {
         // cancel a running autopilot
         pilot_alti = 0;
         monitor_alti = 0;
-        drone_gaz  = gaz;
     }
 
+    drone_yaw  = yaw;
     if (yaw != 0) {
         // cancel a running autopilot
         pilot_head = 0;
-        drone_yaw  = yaw;
     }
 
     drone_pcmd_flags = DRONE_PCMD_FLAG_PROGRESSIVE;
