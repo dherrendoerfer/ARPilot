@@ -296,6 +296,52 @@ void send_command(int http_fd)
     send(http_fd,doc_command,sizeof(doc_command),MSG_NOSIGNAL);
 }
 
+void send_xml_status(int http_fd)
+{
+    char header[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: text/xml\r\n\r\n"};
+    char tmp[2048];
+
+    send(http_fd,header,sizeof(header),MSG_NOSIGNAL);
+
+    float32_t heading = navdata_unpacked.navdata_demo.psi;
+            if (heading < 0)
+                heading += 360000;
+
+    sprintf(tmp,"<drone>\n"
+    		    "<status>\n"
+                "<fly>%d</fly>\n"
+                "<batt>%d</batt>\n"
+                "<altitude>%d</altitude>\n"
+                "<theta>%f</theta>\n"
+                "<phi>%f</phi>\n"
+                "<psi>%f</psi>\n"
+                "</status>\n"
+                  ,drone_fly
+                  ,navdata_unpacked.navdata_demo.vbat_flying_percentage
+                  ,navdata_unpacked.navdata_demo.altitude
+                  ,navdata_unpacked.navdata_demo.theta
+                  ,navdata_unpacked.navdata_demo.phi
+                  ,heading);
+
+    send(http_fd,tmp,strlen(tmp),MSG_NOSIGNAL);
+
+    sprintf(tmp,"<position>\n"
+                "<lon>%f</lon>\n"
+                "<lat>%f</lat>\n"
+                "<alt>%d</alt>\n"
+                "<course>%d</course>\n"
+                "<hdop>%d</hdop>\n"
+                "</position>\n"
+    		    "</drone>\n"
+                  ,pos_lon
+                  ,pos_lat
+                  ,pos_alt
+                  ,pos_course
+                  ,pos_hdop);
+
+    send(http_fd,tmp,strlen(tmp),MSG_NOSIGNAL);
+}
+
 void send_cmd(int http_fd, char *buffer)
 {
     char error[] = {"HTTP/1.0 200 OK\r\nServer: ardrone\r\nContent-Type: text/html\r\n\r\n"
@@ -307,7 +353,7 @@ void send_cmd(int http_fd, char *buffer)
     if (!strncmp(buffer,"cmd=",4)) {
         buffer += 4;
 
-        send_index(http_fd);
+        send_xml_status(http_fd);
 
         if (!strncmp(buffer,"fwd",3)) {
             command_move(0,-500,0,0);

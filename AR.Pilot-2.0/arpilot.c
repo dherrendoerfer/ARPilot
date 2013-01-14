@@ -98,6 +98,9 @@ int execcommand()
     if ((strncmp(command,"$PHDO",5) == 0) && args == 1)
         ret=command_set_hdop(arg[0]);
 
+    if ((strncmp(command,"$MOVE",5) == 0) && args == 4)
+    	ret=command_move(arg[0],arg[1],arg[2],arg[3]);
+
     if ((strncmp(command,"$STAT",5) == 0) && args == 1)
         ret=command_state(arg[0]);
 
