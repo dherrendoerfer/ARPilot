@@ -35,7 +35,7 @@ all: lib arpilot
 lib: $(LIB_OBJS)
 	ar r $(LIB) $(LIB_OBJS)
 
-arpilot: $(PROG_OBJS)
+arpilot: $(PROG_OBJS) lib
 	$(CC) $(CFLAGS) $(PROG_OBJS) $(LIB) -o $(PROG)
 
 install: $(PROG)
