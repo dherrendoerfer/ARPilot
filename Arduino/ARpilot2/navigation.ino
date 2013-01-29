@@ -148,7 +148,7 @@ int reached()
 
 int near()
 {
-  return (distance_to_wp < 10);
+  return (distance_to_wp < 20);
 }
 
 void navigation_init ()

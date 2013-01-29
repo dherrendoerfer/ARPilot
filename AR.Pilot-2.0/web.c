@@ -308,14 +308,12 @@ void send_xml_status(int http_fd)
                 heading += 360000;
 
     sprintf(tmp,"<drone>\n"
-    		    "<status>\n"
-                "<fly>%d</fly>\n"
-                "<batt>%d</batt>\n"
-                "<altitude>%d</altitude>\n"
-                "<theta>%f</theta>\n"
-                "<phi>%f</phi>\n"
-                "<psi>%f</psi>\n"
-                "</status>\n"
+    		    "<status fly=\"%d\" "
+                "batt=\"%d\" "
+                "altitude=\"%d\" "
+                "theta=\"%f\" "
+                "phi=\"%f\" "
+                "psi=\"%f\"/>\n"
                   ,drone_fly
                   ,navdata_unpacked.navdata_demo.vbat_flying_percentage
                   ,navdata_unpacked.navdata_demo.altitude
@@ -325,13 +323,11 @@ void send_xml_status(int http_fd)
 
     send(http_fd,tmp,strlen(tmp),MSG_NOSIGNAL);
 
-    sprintf(tmp,"<position>\n"
-                "<lon>%f</lon>\n"
-                "<lat>%f</lat>\n"
-                "<alt>%d</alt>\n"
-                "<course>%d</course>\n"
-                "<hdop>%d</hdop>\n"
-                "</position>\n"
+    sprintf(tmp,"<position lon=\"%f\" "
+                "lat=\"%f\" "
+                "alt=\"%d\" "
+                "course=\"%d\" "
+                "hdop=\"%d\"/>\n"
     		    "</drone>\n"
                   ,pos_lon
                   ,pos_lat

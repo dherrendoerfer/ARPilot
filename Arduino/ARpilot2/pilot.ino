@@ -217,10 +217,10 @@ void pilot_fly()
     }
     if (pilot_manoever_step == 11) {
       int speed = distance_to_wp * distance_to_wp;
-      if (speed < 300)
+      if (speed < 200)
         speed=200;
-      if (speed > 1000)
-        speed=1000;
+      if (speed > 500)
+        speed=500;
       /*Fly to target by leaning in only*/
       move_toward(drone_angle, course_to_wp, speed, &pitch, &roll);
       drone_move(roll, pitch, gaz, yaw);

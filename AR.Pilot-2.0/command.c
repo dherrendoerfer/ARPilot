@@ -61,7 +61,7 @@ float pos_lon;
 float pos_lat;
 int   pos_alt;
 int   pos_course;
-int   pos_hdop;
+int   pos_hdop = 9999;
 
 void set_command_timestamp()
 {
@@ -333,8 +333,8 @@ int command_limit(int yaw, int vz, int angle, int altitude)
 {
     char tmp[64];
 
-    float f_yaw = yaw/100;
-    float f_angle = angle/100;
+    float f_yaw = (float)yaw/100;
+    float f_angle = (float)angle/100;
 
     sprintf(tmp,"%#.2f",f_yaw);
     addATCONFIG(cmdbuffer, "control:control_yaw", tmp);

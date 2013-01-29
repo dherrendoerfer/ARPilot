@@ -113,6 +113,12 @@ int main()
         	exit(1);
         printf("libarpilot:web \n");
 
+        /*Limits: max_yaw    2.50
+                     max_vz   700
+                  max_euler  0.30
+                   altitude 50000 (50m)*/
+        command_limit(150,700,30,50000);
+
         // Start the main loop
 
 #endif
